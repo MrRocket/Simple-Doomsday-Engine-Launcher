@@ -1,0 +1,944 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Simple_Doomsday_Engine_Launcher.ViewModels"
+        xmlns:model="using:Simple_Doomsday_Engine_Launcher.Models"
+        x:Class="Simple_Doomsday_Engine_Launcher.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" 
+        Width="500" Height="560"
+        d:DesignWidth="500" d:DesignHeight="560"
+        Background="#0d1a1f"
+        Icon="/Assets/DE_Launcher2.ico"
+        Title="Simple Doomsday Engine Launcher"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+     <!-- GLOBAL GLOW ANIMATION STYLES CONTAINER -->
+    <!-- FIXED: MOVED PULSING LAYER TO WINDOW RESOURCES TO PREVENT TAB FREEZING -->
+    <Window.Resources>
+        <SolidColorBrush x:Key="GlowBaseColor" Color="#00919A"/>
+    </Window.Resources>
+
+ 
+       <!-- GLOBAL GLOW ANIMATION STYLES CONTAINER -->
+     <!-- GLOBAL GLOW ANIMATION STYLES CONTAINER -->
+    <Window.Styles>
+        <Style>
+            <Style.Resources>
+                <!-- Warning Amber parameter values -->
+                <BoxShadows x:Key="WarningGlowLow">0 0 4 1 #9A5A00</BoxShadows>
+                <BoxShadows x:Key="WarningGlowHigh">0 0 14 3 #FF9D00</BoxShadows>
+            </Style.Resources>
+        </Style>
+
+        <!-- Launcher button cyan glow track (Works perfectly as-is) -->
+        <Style Selector="Border.GlowWrapper">
+            <Setter Property="BoxShadow" Value="0 0 14 3 #00E5F2"/>
+            <Style.Animations>
+                <Animation Duration="0:0:1.5" IterationCount="Infinite" PlaybackDirection="Alternate">
+                    <KeyFrame KeyTime="0:0:0"><Setter Property="Opacity" Value="0.35"/></KeyFrame>
+                    <KeyFrame KeyTime="0:0:1.5"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- TARGET 1: Direct Warning Border (Fixes Browse Button Wrappers) -->
+        <Style Selector="Border.WarningGlowWrapper">
+            <Setter Property="BoxShadow" Value="0 0 12 2 #FF9D00"/>
+            <Style.Animations>
+                <Animation Duration="0:0:1.2" IterationCount="Infinite" PlaybackDirection="Alternate">
+                    <KeyFrame KeyTime="0:0:0"><Setter Property="Opacity" Value="0.25"/></KeyFrame>
+                    <KeyFrame KeyTime="0:0:1.2"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- TARGET 2: TabItem Header Layout (Fixes Help Header Tab Glow) -->
+        <Style Selector="TabItem.WarningGlowWrapper /template/ ContentPresenter">
+            <!-- Renders the shadow directly onto the background plate of the tab item header header text -->
+            <Setter Property="BoxShadow" Value="0 0 10 2 #FF9D00"/>
+            <Style.Animations>
+                <Animation Duration="0:0:1.2" IterationCount="Infinite" PlaybackDirection="Alternate">
+                    <KeyFrame KeyTime="0:0:0"><Setter Property="Opacity" Value="0.35"/></KeyFrame>
+                    <KeyFrame KeyTime="0:0:1.2"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </Window.Styles>
+
+
+
+
+
+
+
+
+    <TabControl>
+        <TabControl.Styles>
+            <Style Selector="TabItem /template/ ContentPresenter">
+                <Setter Property="FontSize" Value="16"/>
+            </Style>
+        </TabControl.Styles>
+
+
+
+        <!-- ===================== SETUP TAB ===================== -->
+    <TabItem Header="Setup Game">
+     <DockPanel Margin="10">
+         
+
+         
+<!-- LAUNCH BUTTON CONTAINER WITH CONDITIONAL GLOW AND BUTTON DISABLE -->
+<Border Classes.GlowWrapper="{Binding IsLaunchConfigReady}"
+        DockPanel.Dock="Bottom"
+        CornerRadius="4"
+        Margin="0,10,0,0">
+    
+    <Button Content="Launch Game"
+            IsEnabled="{Binding IsLaunchConfigReady}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            Command="{Binding LaunchCommand}"
+            Background="#1B3D45"
+            Foreground="White"
+            BorderBrush="#00919A"
+            Height="35"
+            FontWeight="Bold"
+            FontSize="17"/>
+</Border>
+
+
+
+
+
+
+         <!-- LAUNCH PARAMETERS -->
+    <Border DockPanel.Dock="Bottom"
+            Background="#0a1418"
+            BorderBrush="#14505e"
+            BorderThickness="1"
+            CornerRadius="4"
+            Margin="0,0,0,6"
+            Padding="6">
+
+        <StackPanel Spacing="4">
+
+                   <ScrollViewer Height="70"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+
+                <TextBox Text="{Binding FinalLaunchCommand}"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Background="#11252b"
+                         Foreground="#217587"
+                         BorderBrush="#14505e"
+                         FontSize="11"
+                         FontWeight="Bold"
+                         FontFamily="Consolas"/>
+             
+            </ScrollViewer>
+        </StackPanel>
+
+    </Border>
+
+
+        <!-- MAIN CONTENT -->
+        <StackPanel Spacing="10">
+            
+            <!-- TOP SECTION: ENGINE, SERVER, IWAD FOLDER, PWAD -->
+            <StackPanel Spacing="10">
+
+              <!-- ENGINE LOCATION GRID SLOT ROW -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0"
+                             Watermark="Doomsday Location. eg: C:/doomsday/bin/Doomsday.exe"
+                             Text="{Binding EngineLocation}"
+                             Background="#11252b"
+                             Foreground="White"
+                             BorderBrush="#14505e"/>
+    
+                    <!-- ENGINE BROWSE CONTAINER WITH CONDITIONAL WARN PULSE -->
+                    <Border Grid.Column="1"
+                            Classes.WarningGlowWrapper="{Binding NeedsConfiguration}"
+                            CornerRadius="4"
+                            Margin="6,0,0,0">
+                        <Button Content="Browse"
+                                Command="{Binding BrowseEngineCommand}"
+                                Background="#1B3D45"
+                                Foreground="White"
+                                BorderBrush="#00919A"/>
+                    </Border>
+                </Grid>
+
+                <!-- SERVER LOCATION -->
+                <Grid ColumnDefinitions="*,Auto">
+             <!--       <TextBox Grid.Column="0"
+                             Watermark="Server Location"
+                             Text="{Binding ServerLocation}"
+                             Background="#11252b"
+                             Foreground="White"
+                             BorderBrush="#14505e"/>
+                    <Button Grid.Column="1"
+                            Content="Browse"
+                            Command="{Binding BrowseServerCommand}"
+                            Background="#1B3D45"
+                            Foreground="White"
+                            BorderBrush="#00919A"
+                            Margin="6,0,0,0"/> -->
+                </Grid>
+
+            <!-- IWAD FOLDER GRID SLOT ROW -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Grid.Column="0"
+                                 Watermark="IWAD Folder"
+                                 Text="{Binding IWADFolder}"
+                                 Background="#11252b"
+                                 Foreground="White"
+                                 BorderBrush="#14505e"/>
+    
+                        <!-- IWAD FOLDER BROWSE CONTAINER WITH CONDITIONAL WARN PULSE -->
+                        <Border Grid.Column="1"
+                                Classes.WarningGlowWrapper="{Binding NeedsConfiguration}"
+                                CornerRadius="4"
+                                Margin="6,0,0,0">
+                            <Button Content="Browse"
+                                    Command="{Binding BrowseIwadFolderCommand}"
+                                    Background="#1B3D45"
+                                    Foreground="White"
+                                    BorderBrush="#00919A"/>
+                        </Border>
+                    </Grid>
+
+                <!-- PWAD -->
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBox Grid.Column="0"
+                             Watermark="PWAD File"
+                             Text="{Binding PwadLocation}"
+                             Background="#11252b"
+                             Foreground="White"
+                             BorderBrush="#14505e"/>
+
+                    <Button Grid.Column="1"
+                            Content="Clear"
+                            Command="{Binding ClearPwadCommand}"
+                            Background="#1B3D45"
+                            Foreground="White"
+                            Margin="6,0,0,0"/>
+
+                    <Button Grid.Column="2"
+                            Content="Browse"
+                            Command="{Binding BrowsePwadCommand}"
+                            Background="#1B3D45"
+                            Foreground="White"
+                            BorderBrush="#00919A"
+                            Margin="6,0,0,0"/>
+                </Grid>
+
+            </StackPanel>
+
+            <!-- BOTTOM SECTION: COMBOBOXES ON LEFT, PREVIEW ON RIGHT -->
+            <Grid ColumnDefinitions="140,*">
+                
+                <!-- LEFT: Comboboxes -->
+                <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,10,0">
+
+                    <!-- IWAD -->
+                    <ComboBox ItemsSource="{Binding IWADs}"
+                              SelectedItem="{Binding SelectedIWAD}"
+                              Background="#11252b"
+                              Foreground="White"
+                              BorderBrush="#14505e"
+                              PlaceholderText="Select IWAD"
+                              HorizontalAlignment="Stretch"/>
+
+                    <!-- MAP -->
+                    <ComboBox ItemsSource="{Binding Maps}"
+                              SelectedItem="{Binding SelectedMap}"
+                              Background="#11252b"
+                              Foreground="White"
+                              BorderBrush="#14505e"
+                              PlaceholderText="Select Map"
+                              HorizontalAlignment="Stretch"/>
+
+                    <!-- SKILL -->
+                    <ComboBox ItemsSource="{Binding SkillOptions}"
+                              SelectedItem="{Binding SelectedSkillOption}"
+                              Background="#11252b"
+                              Foreground="White"
+                              BorderBrush="#14505e"
+                              HorizontalAlignment="Stretch">
+
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Display}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+
+                    </ComboBox>
+
+                                        <!-- Host Server -->
+                    <CheckBox Grid.Row="0" Grid.Column="0"
+                              Content="Host Server"
+                              IsChecked="{Binding HostServer}"
+                              Foreground="White"/>
+
+   
+
+                    <!-- Public Server -->
+                    <CheckBox Grid.Row="1" Grid.Column="0"
+                              Content="Public Server"
+                              IsChecked="{Binding PublicServer}"
+                              Foreground="White"/>
+
+
+                </StackPanel>
+
+                <!-- RIGHT: Preview Image -->
+
+               <Border Grid.Column="1"
+                    Background="#080E10"
+                    BorderBrush="#14505e"
+                    BorderThickness="3"
+                    CornerRadius="6"
+                    Height="200"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top">
+
+               <Grid>
+                <!-- IMAGE -->
+                <Image Source="{Binding IwadPreviewImage}"
+                       Width="280"
+                       Height="180"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding HasPreviewImage}"/>
+
+                <!-- FALLBACK TEXT -->
+                <TextBlock Text="No IWADs found in this location"
+                           Foreground="Gray"
+                           FontSize="12"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding HasNoIWADs}"/>
+            </Grid>
+
+        </Border>
+
+            </Grid>
+
+        </StackPanel>
+
+    </DockPanel>
+</TabItem>
+
+
+ 
+
+      
+<TabItem Header="Server Settings">
+    <DockPanel Margin="10">
+
+<!-- LAUNCH BUTTON CONTAINER WITH CONDITIONAL GLOW AND BUTTON DISABLE -->
+<Border Classes.GlowWrapper="{Binding IsLaunchConfigReady}"
+        DockPanel.Dock="Bottom"
+        CornerRadius="4"
+        Margin="0,10,0,0">
+    
+    <Button Content="Launch Game"
+            IsEnabled="{Binding IsLaunchConfigReady}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            Command="{Binding LaunchCommand}"
+            Background="#1B3D45"
+            Foreground="White"
+            BorderBrush="#00919A"
+            Height="35"
+            FontWeight="Bold"
+            FontSize="17"/>
+</Border>
+
+
+        <!-- SCROLLABLE CONTENT ABOVE -->
+        <ScrollViewer>
+            <StackPanel Spacing="8">
+
+                <!-- HOST / PUBLIC + GAME TYPE + NO MONSTERS -->
+                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto" Margin="0,0,0,10">
+
+                    <!-- Game Type -->
+                    <ComboBox Grid.Row="0" Grid.Column="0"
+                              Margin="0,0,0,0"
+                              SelectedItem="{Binding SelectedGameType}"
+                              Width="150"
+                              Background="#11252b"
+                              Foreground="White"
+                              BorderBrush="#14505e">
+                        <sys:String>Co-op</sys:String>
+                        <sys:String>Deathmatch</sys:String>
+                    </ComboBox>
+
+                    <!-- MaxPlayers -->
+                    <ComboBox Grid.Row="0" Grid.Column="1"
+                              Margin="20,0,0,0"
+                              SelectedItem="{Binding SelectedMaxPlayers}"
+                              Width="70"
+                              Background="#11252b"
+                              Foreground="White"
+                              BorderBrush="#14505e">
+                        <sys:String>1</sys:String>
+                        <sys:String>2</sys:String>
+                        <sys:String>3</sys:String>
+                        <sys:String>4</sys:String>
+                        <sys:String>5</sys:String>
+                        <sys:String>6</sys:String>
+                        <sys:String>7</sys:String>
+                        <sys:String>8</sys:String>
+                    </ComboBox>
+
+                    <!-- No Monsters -->
+                    <CheckBox Grid.Row="0" Grid.Column="2"
+                              Margin="100,0,0,0"
+                              Content="No Monsters"
+                              IsChecked="{Binding NoMonsters}"
+                              Foreground="White"/>
+                </Grid>
+
+                <!-- SERVER NAME -->
+                <TextBox Watermark="Server Name"
+                         Text="{Binding ServerName}"
+                         Background="#11252b"
+                         Foreground="White"
+                         BorderBrush="#14505e"/>
+
+                <!-- FIXED: STRUCTURAL GRID ARRANGEMENT LAYER -->
+                <Grid ColumnDefinitions="Auto, *">
+                    <TextBlock Grid.Column="0" 
+                               Text="server.cfg"
+                               Foreground="#8abfc9"
+                               VerticalAlignment="Center"/>
+                    
+                    <TextBlock Grid.Column="1" 
+                               Text="Server name already taken!"
+                               Foreground="#FF4A4A"
+                               FontWeight="Bold"
+                               FontSize="13"
+                               Margin="12,0,0,0"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding NameIsTaken}"/>
+                </Grid>
+
+                <TextBox Text="{Binding ServerCfg}"
+                         AcceptsReturn="True"
+                         Height="150"
+                         Background="#11252b"
+                         Foreground="White"
+                         BorderBrush="#14505e"/>
+
+                <!-- CLIENT PARAMETERS -->
+                <TextBlock Text="Client Parameters"
+                           Foreground="#8abfc9"/>
+
+                <TextBox Text="{Binding ClientParameters}"
+                         Background="#11252b"
+                         Foreground="White"
+                         BorderBrush="#14505e"/>
+
+                <!-- SERVER PARAMETERS -->
+                <TextBlock Text="Server Parameters"
+                           Foreground="#8abfc9"/>
+
+                <TextBox Text="{Binding ServerParameters}"
+                         Background="#11252b"
+                         Foreground="White"
+                         BorderBrush="#14505e"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </DockPanel>
+</TabItem>
+
+
+
+<!-- ===================== SERVER BROWSER ===================== -->
+<TabItem Header="Server Browser">
+    <Border Background="#0d1a1f"
+            CornerRadius="4"
+            Padding="12"
+            Margin="0,5,0,0"
+            BorderBrush="#14505e"
+            BorderThickness="1">
+
+        <DockPanel LastChildFill="True">
+
+            <!-- Bottom Manual Connect -->
+            <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,0,0,10">
+
+                <Grid ColumnDefinitions="*, Auto">
+                    <Button Grid.Column="1"
+                            Margin="0,8,0,0"
+                            Content="REFRESH LIST"
+                            Command="{Binding RefreshServersCommand}"
+                            Background="#1B3D45"
+                            Foreground="White"
+                            Height="28"
+                            Width="115"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            BorderBrush="#00919A"/>
+
+                    <TextBlock Text="Double Click to Join selected Servers."
+                               FontSize="10"
+                               FontWeight="Bold"
+                               Foreground="Teal"
+                               HorizontalAlignment="Left"/>
+                </Grid>
+
+                <TextBlock Text="{Binding MasterStatus}"
+                           Foreground="#8abfc9"
+                           FontSize="10"/>
+            </StackPanel>
+
+            <!-- Server List -->
+            <ListBox ItemsSource="{Binding ServerList}"
+                     SelectedItem="{Binding SelectedServer}"
+                     Background="#11252b"
+                     BorderBrush="#14505e"
+                     BorderThickness="1"
+                     DoubleTapped="ServerList_DoubleTapped">
+
+                <!-- BORDER AROUND EACH SERVER ROW -->
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <Border BorderBrush="#14505e"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Margin="4"
+                                        Padding="6"
+                                        Background="#0f2025">
+                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter>
+                    </Style>
+
+                    <!-- Hover effect (optional but looks great) -->
+                    <Style Selector="ListBoxItem:pointerover Border">
+                        <Setter Property="BorderBrush" Value="#1ecbe1"/>
+                    </Style>
+
+                    <!-- Selected effect -->
+                    <Style Selector="ListBoxItem:selected Border">
+                        <Setter Property="Background" Value="#1a3a42"/>
+                        <Setter Property="BorderBrush" Value="#00ffff"/>
+                    </Style>
+                </ListBox.Styles>
+
+                <!-- SERVER ROW TEMPLATE -->
+                <ListBox.DataTemplates>
+                    <DataTemplate x:DataType="model:DoomsdayServerInfo">
+
+                       <Grid ColumnDefinitions="Auto, Auto, *, Auto" RowDefinitions="Auto, Auto">
+
+                            <!-- 🔥 GAME THUMBNAIL IMAGE -->
+                            <Border Grid.Row="0" Grid.Column="0"
+                                    Grid.RowSpan="2"
+                                    Width="60"
+                                    Height="45"
+                                    Background="#080E10"
+                                    BorderBrush="#14505e"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                
+                                <Image Source="{Binding GameImage}"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            </Border>
+
+
+                            <!-- IP -->
+                       <!--      <TextBlock Grid.Column="0"
+                                       Text="{Binding IP}"
+                                       FontSize="10"
+                                       Foreground="#4dd0e1"
+                                       VerticalAlignment="Center"/> -->
+
+                            <!-- Name + Game + Version -->
+                            <StackPanel Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center">
+
+                                <TextBlock Text="{Binding ServerName}"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="White"/>
+
+                                <TextBlock Text="{Binding Game}"
+                                           FontSize="11"
+                                           Foreground="Cyan"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Version: "
+                                           FontSize="9"
+                                           Foreground="#8abfc9"/>
+
+                                <TextBlock Text="{Binding Version}"
+                                           FontSize="9"
+                                           Foreground="#8abfc9"/>
+                            </StackPanel>
+
+                              <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Players: "
+                                           FontSize="9"
+                                           Foreground="Lime"/>
+
+                                <TextBlock Text="{Binding Players}"
+                                           FontSize="9"
+                                           FontWeight="Bold"
+                                           Foreground="Lime"/>
+
+                                <TextBlock Text="/"
+                                           FontSize="9"
+                                           Foreground="Lime"/>
+
+                                <TextBlock Text="{Binding MaxPlayers}"
+                                           FontSize="9"
+                                           FontWeight="Bold"
+                                           Foreground="Lime"/>
+                            </StackPanel>
+
+                         </StackPanel>
+
+                        <!-- Ping / Addons / Map -->
+                        <StackPanel Grid.Column="2"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center">
+
+                            <!-- Ping -->
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+                                <TextBlock Text="Ping: "
+                                           FontSize="11"
+                                           Foreground="#00FF00"/>
+
+                                <TextBlock Text="{Binding Ping}"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="#00FF00"/>
+
+                                <TextBlock Text=" ms"
+                                           FontSize="8"
+                                           Foreground="LimeGreen"
+                                           VerticalAlignment="Bottom"/>
+                            </StackPanel>
+
+                                        <!-- Addons -->
+                                        <TextBlock Text="Addon:"
+                                           FontSize="9"
+                                           Foreground="Goldenrod" 
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"/> 
+                                       <TextBlock Text="{Binding Addons}"
+                                       FontSize="10" 
+                                       
+                                       Foreground="Goldenrod" 
+                                       HorizontalAlignment="Right"/>
+                         
+
+                            <!-- Map -->
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+                                <TextBlock Text="Map: "
+                                           FontSize="8"
+                                           Foreground="Cyan"/>
+
+                                <TextBlock Text="{Binding Map}"
+                                           FontSize="8"
+                                           FontWeight="Bold"
+                                           Foreground="Cyan"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.DataTemplates>
+
+            </ListBox>
+
+        </DockPanel>
+
+    </Border>
+</TabItem>
+
+
+      <!-- ===================== Options ===================== -->
+        <TabItem Header=" ⚙ ">
+    <DockPanel Margin="10">
+
+       <!-- LAUNCH BUTTON CONTAINER WITH CONDITIONAL GLOW AND BUTTON DISABLE -->
+<Border Classes.GlowWrapper="{Binding IsLaunchConfigReady}"
+        DockPanel.Dock="Bottom"
+        CornerRadius="4"
+        Margin="0,10,0,0">
+    
+    <Button Content="Launch Game"
+            IsEnabled="{Binding IsLaunchConfigReady}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            Command="{Binding LaunchCommand}"
+            Background="#1B3D45"
+            Foreground="White"
+            BorderBrush="#00919A"
+            Height="35"
+            FontWeight="Bold"
+            FontSize="17"/>
+</Border>
+
+        <!-- SCROLLABLE CONTENT ABOVE -->
+     <ScrollViewer>
+    <StackPanel Spacing="12">
+
+        <!-- VIDEO SECTION -->
+        <Border Background="#11252b"
+                BorderBrush="#14505e"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="10">
+        <StackPanel Spacing="6">
+            <TextBlock Text="Video"
+                       Foreground="#8abfc9"
+                       FontSize="12"
+                       FontWeight="Bold"/>
+
+            <!-- FIXED: GRID ARRANGEMENT LAYER FOR LAUNCHER SCALE NOTE -->
+            <Grid ColumnDefinitions="Auto, *">
+                <ComboBox Grid.Column="0"
+                          SelectedItem="{Binding SelectedResolution}"
+                          Width="150"
+                          Background="#0d1a1f"
+                          Foreground="White"
+                          BorderBrush="#14505e">
+                    <sys:String>320x240</sys:String>
+                    <sys:String>502x560</sys:String> 
+                    <sys:String>640x480</sys:String>
+                    <sys:String>800x600</sys:String>
+                    <sys:String>1024x768</sys:String>
+                </ComboBox>
+
+                <!-- Dynamically becomes visible when ShowScaleLabel evaluates to true -->
+                <TextBlock Grid.Column="1"
+                           Text="Launcher Scale"
+                           Foreground="#00919A"
+                           FontWeight="Bold"
+                           FontSize="12"
+                           Margin="12,0,0,0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding ShowScaleLabel}"/>
+            </Grid>
+
+            <CheckBox Content="Fullscreen"
+                      IsChecked="{Binding CheckedFullScreen}"
+                      Foreground="White"/>
+        </StackPanel>
+
+        </Border>
+
+        <!-- AUDIO SECTION -->
+        <Border Background="#11252b"
+                BorderBrush="#14505e"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="10">
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Audio"
+                           Foreground="#8abfc9"
+                           FontSize="12"
+                           FontWeight="Bold"/>
+
+                <CheckBox Content="Enable Reverb"
+                          IsChecked="{Binding EnableReverb}"
+                          Foreground="White"/>
+
+                     <CheckBox Content="Disable CD"
+                          IsChecked="{Binding DisableCD}"
+                          Foreground="White"/>
+
+            </StackPanel>
+        </Border>
+
+        <!-- GAMEPLAY SECTION -->
+        <Border Background="#11252b"
+                BorderBrush="#14505e"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="10">
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Gameplay"
+                           Foreground="#8abfc9"
+                           FontSize="12"
+                           FontWeight="Bold"/>
+
+                <CheckBox Content="Enable Jumping"
+                          IsChecked="{Binding EnableJumping}"
+                          Foreground="White"/>
+
+                <CheckBox Content="Disable Vertical Look"
+                          IsChecked="{Binding DisableMouseLook}"
+                          Foreground="White"/>
+
+           
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
+</ScrollViewer>
+
+    </DockPanel>
+</TabItem>
+
+
+
+
+
+     <!-- ===================== Help ===================== -->
+
+        <!-- ===================== Help Tab Header Alert Layer ===================== -->
+        <TabItem Header="↓" 
+                 FontWeight="Bold"
+                 Classes.WarningGlowWrapper="{Binding NeedsConfiguration}">
+    
+            <DockPanel Margin="10">
+        <!-- Info Text at the bottom -->
+       <TextBox x:Name="Info"
+                DockPanel.Dock="Bottom"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Text="{Binding InfoText}"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 Height="100"
+                 Background="#1B3D45"
+                 Foreground="#8abfc9"
+                 FontSize="11"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+          
+
+    <StackPanel Margin="10" Spacing="5">
+
+<Button Content="Download Doomsday Engine"
+        Command="{Binding InstallDoomsdayCommand}"
+
+        Background="#1B3D45"
+        Foreground="White"
+        BorderBrush="#00919A"
+        IsVisible="{Binding ShowInstallButton}"/>
+
+
+       
+        <TextBlock Text="Installed Version:"
+           Foreground="LightGray"/>
+<TextBlock Text="{Binding InstalledVersion}"
+           Foreground="White"/>
+
+
+  <Button Content="Check for Doomsday Updates"
+        Command="{Binding CheckForUpdatesCommand}"
+        IsEnabled="{Binding CanCheckForUpdates}"
+        Background="#1B3D45"
+        Foreground="White"
+        BorderBrush="#00919A"/>
+
+
+        <TextBlock Text="{Binding UpdateStatus}"
+                   Foreground="#8abfc9"
+                   FontSize="11"/>
+
+<!-- Progress bar -->
+<StackPanel.Styles>
+    <Style Selector="ProgressBar">
+        <Setter Property="Foreground" Value="Teal"/> <!-- Cyan fill -->
+        <Setter Property="Background" Value="#0a1a1f"/> <!-- Track -->
+
+    </Style>
+</StackPanel.Styles>
+
+<Border BorderBrush="#14505e"
+        BorderThickness="1"
+        CornerRadius="4"
+        Padding="2"
+        Background="#0a1a1f"
+        IsVisible="{Binding IsUpdating}">
+
+    <ProgressBar Minimum="0"
+                 Maximum="100"
+                 Height="12"
+                 Value="{Binding UpdateProgress}"
+                 IsVisible="{Binding IsUpdating}"/>
+</Border>
+
+
+
+
+        <TextBox x:Name="LogTextBox"
+                 Text="{Binding LogText}"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 Height="220"
+                 Background="#111"
+                 Foreground="#8abfc9"
+                 FontSize="14"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+               <!-- FIXED: AUTOMATED MULTI-STAGE DOWNLOAD BUTTON FOR CONTEXT ROUTING -->
+        <Border Classes.WarningGlowWrapper="{Binding ShouldFreeDownloadButtonGlow}"
+                CornerRadius="4"
+                Margin="0,5,0,0">
+            
+            <Button Content="{Binding FreeIwadButtonText}"
+                    Command="{Binding DownloadAllFreeContentCommand}"
+                    IsEnabled="{Binding !AreFreeIwadsInstalled}"
+                    Background="#1B3D45"
+                    Foreground="White"
+                    BorderBrush="#00919A"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"/>
+        </Border>
+
+
+    </StackPanel>
+
+</DockPanel>
+</TabItem>
+
+
+
+
+    </TabControl>
+
+</Window>

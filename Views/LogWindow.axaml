@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Simple_Doomsday_Engine_Launcher.LogWindow"
+        x:CompileBindings="False"
+        Width="500" Height="400"
+        Title="Update Log"
+        WindowStartupLocation="CenterOwner">
+
+    <Border Padding="10">
+        <ListBox ItemsSource="{Binding LogEntries}" />
+    </Border>
+</Window>
+
+
+
+
