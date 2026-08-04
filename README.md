@@ -76,11 +76,8 @@ Simple Doomsday Engine Launcher is designed to make launching classic Doom-engin
 - Visual Studio 2022
 - .NET 8 SDK
 
-### Clone Repository
-
-```bash
-git clone https://github.com/MrRocket/Simple-Doomsday-Engine-Launcher.git
-```
+### Download the Source zip file:
+Simple-Doomsday-Engine-Launcher-main.zip
 
 ### Dependencies
 The project relies on NuGet to restore the following core libraries:
