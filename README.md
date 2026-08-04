@@ -64,6 +64,9 @@ Simple Doomsday Engine Launcher is designed to make launching classic Doom-engin
 
 *Recommended setup directory: `C:\Simple Doomsday Engine Launcher`*
 
+> ⚠️ *Note: When running the Launcher for the first time, you may be instructed to download:
+> .NET 8.
+
 ---
 
 ## Building From Source
