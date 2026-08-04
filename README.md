@@ -78,6 +78,7 @@ Simple Doomsday Engine Launcher is designed to make launching classic Doom-engin
 
 ### Download the Source zip file:
 Simple-Doomsday-Engine-Launcher-main.zip
+https://github.com/MrRocket/Simple-Doomsday-Engine-Launcher/archive/refs/heads/main.zip
 
 ### Dependencies
 The project relies on NuGet to restore the following core libraries:
